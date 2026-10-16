@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { getDashboardData } from "../dashboard.api";
 import type { DashboardData } from "../dashboard.types";
@@ -11,33 +11,17 @@ interface UseDashboardResult {
 }
 
 export const useDashboard = (): UseDashboardResult => {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchDashboard = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const dashboardData = await getDashboardData();
-
-      setData(dashboardData);
-    } catch {
-      setError("Unable to load dashboard data. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void fetchDashboard();
-  }, [fetchDashboard]);
+  const dashboardQuery = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: getDashboardData,
+  });
 
   return {
-    data,
-    isLoading,
-    error,
-    refetch: fetchDashboard,
+    data: dashboardQuery.data ?? null,
+    isLoading: dashboardQuery.isLoading,
+    error: dashboardQuery.error ? "Unable to load dashboard data. Please try again." : null,
+    refetch: async () => {
+      await dashboardQuery.refetch();
+    },
   };
 };

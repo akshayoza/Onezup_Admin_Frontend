@@ -1,0 +1,14 @@
+import type { NotificationTemplate } from "./notifications.types";
+
+export const MOCK_NOTIFICATION_TEMPLATES: NotificationTemplate[] = [
+  { id: "ntf-001", event: "Ride booked", linkedDescription: "Triggered when a passenger confirms a ride", channels: ["in-app", "push", "sms"], status: "active", createdAt: "26 Nov 2024 At 2pm", audience: "passengers", message: "Your ride has been booked successfully." },
+  { id: "ntf-002", event: "Captain assigned", linkedDescription: "When a captain is matched to a booking", channels: ["in-app", "push"], status: "active", createdAt: "26 Nov 2024 At 2pm", audience: "passengers", message: "A captain has been assigned to your ride." },
+  { id: "ntf-003", event: "Ride Canceled by Captain", linkedDescription: "Captain cancels before pickup", channels: ["in-app", "push", "sms"], status: "active", createdAt: "26 Nov 2024 At 2pm", audience: "passengers", message: "Your captain canceled the ride. Please book again." },
+  { id: "ntf-004", event: "Payment failed", linkedDescription: "UPI/card payment fails at checkout", channels: ["in-app", "sms"], status: "active", createdAt: "26 Nov 2024 At 2pm", audience: "passengers", message: "Your payment failed. Please try again." },
+  { id: "ntf-005", event: "Ticket escalated to L2", linkedDescription: "Support ticket moves from L1 to L2", channels: ["in-app", "sms"], status: "active", createdAt: "26 Nov 2024 At 2pm", audience: "all-users", message: "Your support ticket has been escalated." },
+  { id: "ntf-006", event: "Payout processed", linkedDescription: "When a driver's payout is processed", channels: ["in-app", "push", "email"], status: "active", createdAt: "25 Nov 2024 At 11am", audience: "drivers", message: "Your payout has been processed." },
+  { id: "ntf-007", event: "Document verification pending", linkedDescription: "Reminder about documents awaiting review", channels: ["in-app", "sms"], status: "active", createdAt: "25 Nov 2024 At 10am", audience: "drivers", message: "Please verify your pending documents." },
+  { id: "ntf-008", event: "Ride reminder", linkedDescription: "Reminder shortly before scheduled pickup", channels: ["push", "sms"], status: "active", createdAt: "24 Nov 2024 At 5pm", audience: "passengers", message: "Your scheduled ride is coming up soon." },
+  { id: "ntf-009", event: "Welcome notification", linkedDescription: "After a new user completes registration", channels: ["in-app", "email"], status: "active", createdAt: "24 Nov 2024 At 9am", audience: "all-users", message: "Welcome! Your account is ready." },
+  { id: "ntf-010", event: "Promotional campaign", linkedDescription: "Draft template for future promotional campaigns", channels: ["push", "email"], status: "draft", createdAt: "23 Nov 2024 At 3pm", audience: "passengers", message: "Enjoy offers on your next ride." },
+];

@@ -1,28 +1,54 @@
+import { lazy, Suspense, type ComponentType } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import LoginPage from "../pages/auth/LoginPage";
-import DashboardPage from "../pages/dashboard/DashboardPage";
-import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
-import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
-import TwoFactorAuthenticationPage from "../pages/auth/TwoFactorAuthenticationPage";
+
+const routeElement = (Page: ComponentType) => (
+  <Suspense fallback={<main className="grid min-h-screen place-items-center text-text-secondary">Loading…</main>}>
+    <Page />
+  </Suspense>
+);
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: routeElement(lazy(() => import("../pages/auth/LoginPage"))),
   },
   {
     path: "/two-factor-authentication",
-    element: <TwoFactorAuthenticationPage />,
+    element: routeElement(lazy(() => import("../pages/auth/TwoFactorAuthenticationPage"))),
   },
   {
     path: "/forgot-password",
-    element: <ForgotPasswordPage />,
+    element: routeElement(lazy(() => import("../pages/auth/ForgotPasswordPage"))),
   },
   {
     path: "/dashboard",
-    element: <DashboardPage />,
+    element: routeElement(lazy(() => import("../pages/dashboard/DashboardPage"))),
   },
   {
     path: "/reset-password",
-    element: <ResetPasswordPage />,
+    element: routeElement(lazy(() => import("../pages/auth/ResetPasswordPage"))),
+  },
+  {
+    path: "/drivers",
+    element: routeElement(lazy(() => import("../pages/drivers/DriversPage"))),
+  },
+  {
+    path: "/riders",
+    element: routeElement(lazy(() => import("../pages/riders/RidersPage"))),
+  },
+  {
+    path: "/payments",
+    element: routeElement(lazy(() => import("../pages/payments/PaymentsPage"))),
+  },
+  {
+    path: "/notifications",
+    element: routeElement(lazy(() => import("../pages/notifications/NotificationManagementPage"))),
+  },
+  {
+    path: "/tickets",
+    element: routeElement(lazy(() => import("../pages/tickets/TicketManagementPage"))),
+  },
+  {
+    path: "/reports-analytics",
+    element: routeElement(lazy(() => import("../pages/reports-analytics/ReportsAnalyticsPage"))),
   },
 ]);

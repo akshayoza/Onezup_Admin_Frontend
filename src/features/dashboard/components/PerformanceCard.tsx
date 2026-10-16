@@ -6,7 +6,7 @@ interface PerformanceCardProps {
 
 const PerformanceCard = ({ performance }: PerformanceCardProps) => {
   return (
-    <section className="rounded-xl bg-surface-muted p-6">
+    <section className="rounded-xl bg-[#F0F0F8] p-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-text-primary">
           Today's Performance

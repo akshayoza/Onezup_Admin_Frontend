@@ -22,8 +22,8 @@ export const DASHBOARD_NAVIGATION = [
     icon: Car,
   },
   {
-    label: "Passengers",
-    path: "/passengers",
+    label: "Riders",
+    path: "/riders",
     icon: Users,
   },
   {
@@ -43,7 +43,7 @@ export const DASHBOARD_NAVIGATION = [
   },
   {
     label: "Reports & Analytics",
-    path: "/reports",
+    path: "/reports-analytics",
     icon: BarChart3,
   },
   {
