@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Bell, Search, Siren } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Bell, LogOut, Search, Siren } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import SosAlertsModal from "../../features/sos-alerts/components/SosAlertsModal";
+import { clearAdminAuthentication, getAdminAccessToken } from "../../features/auth/auth-session";
+import { logoutAdmin } from "../../features/auth/auth.api";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -19,10 +21,27 @@ const PAGE_TITLES: Record<string, string> = {
 
 const Topbar = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [isSosOpen, setIsSosOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isDashboard = pathname === "/dashboard";
   const pageTitle = PAGE_TITLES[pathname] ?? "Onezup Admin";
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    let loginError: string | undefined;
+    try {
+      const token = getAdminAccessToken();
+      if (token) await logoutAdmin(token);
+    } catch {
+      loginError = "You have been signed out locally, but the server could not confirm logout.";
+    } finally {
+      clearAdminAuthentication();
+      navigate("/login", { replace: true, state: loginError ? { loginError } : undefined });
+    }
+  };
 
   return (
     <>
@@ -79,6 +98,11 @@ const Topbar = () => {
                 Super Admin
               </span>
             </span>
+          </button>
+
+          <button type="button" aria-label="Logout" onClick={handleLogout} disabled={isLoggingOut} className="inline-flex h-10 items-center gap-2 rounded-lg px-2 text-sm font-medium text-text-secondary hover:bg-surface-muted hover:text-text-primary disabled:opacity-60 sm:px-3">
+            <LogOut size={18} aria-hidden="true" />
+            <span className="hidden sm:inline">{isLoggingOut ? "Signing out..." : "Logout"}</span>
           </button>
         </div>
       </header>

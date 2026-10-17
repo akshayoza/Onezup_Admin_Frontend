@@ -37,7 +37,7 @@ export default function PaymentsTable({ payments }: PaymentsTableProps) {
     setSelectedPayment(null);
   }, []);
 
-  // Close the profile with Escape.
+
   useEffect(() => {
     if (!selectedPayment) return;
 

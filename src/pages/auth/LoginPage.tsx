@@ -14,7 +14,10 @@ const LoginPage = () => {
     location.state?.successMessage ?? null,
   );
 
-  const [loginError, setLoginError] = useState<string | null>(null);
+  const initialLoginError = location.state?.loginError as string | undefined;
+  const [loginError, setLoginError] = useState<string | null>(
+    initialLoginError ?? null,
+  );
 
   useEffect(() => {
     if (!successMessage) {

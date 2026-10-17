@@ -54,11 +54,38 @@ const RidersTable = ({ riders, onViewDetails, onStatusChange, onAccountStatusCha
                   onViewDetails(rider);
                 }
               }}
-              className="cursor-pointer transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-primary">
-              <td className="whitespace-nowrap px-4 py-4 text-text-muted">#{rider.riderCode}</td>
+              className="cursor-pointer transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand-primary"
+            >
+              <td className="relative whitespace-nowrap px-4 py-4 text-text-muted">
+                <div className="group relative inline-flex items-center">
+                  <span className="cursor-pointer font-mono transition-colors group-hover:text-text-primary">
+                    #{rider.riderCode.slice(0, 8)}
+                  </span>
+                  {rider.riderCode.length > 8 && (
+                    <div
+                      role="tooltip"
+                      className="pointer-events-none absolute bottom-full left-0 z-50 mb-2 hidden whitespace-nowrap rounded-md bg-[#18181b] px-2.5 py-1 font-mono text-xs font-normal text-white shadow-xl ring-1 ring-white/10 group-hover:inline-block"
+                    >
+                      #{rider.riderCode}
+                      <span className="absolute -bottom-1 left-4 h-2 w-2 rotate-45 bg-[#18181b]" />
+                    </div>
+                  )}
+                </div>
+              </td>
               <td className="whitespace-nowrap px-4 py-4">
                 <div className="inline-flex items-center gap-3">
-                  {rider.avatarUrl ? <img src={rider.avatarUrl} alt="" loading="lazy" className="h-9 w-9 rounded-full bg-surface-muted object-cover" /> : <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-muted font-semibold">{rider.name.charAt(0)}</span>}
+                  {rider.avatarUrl ? (
+                    <img
+                      src={rider.avatarUrl}
+                      alt=""
+                      loading="lazy"
+                      className="h-9 w-9 shrink-0 rounded-full border border-border bg-surface-muted object-cover"
+                    />
+                  ) : (
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-primary/20 bg-brand-primary/10 font-semibold text-brand-primary transition-colors">
+                      {rider.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                   <span className="font-semibold text-text-primary">{rider.name}</span>
                 </div>
               </td>

@@ -1,20 +1,87 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DEFAULT_RIDER_FILTERS, RIDERS_PAGE_SIZE } from "../riders.constants";
-import { MOCK_RIDERS } from "../riders.mock";
+
+import { getPassengers } from "../riders.api";
+import type { PassengerApi } from "../riders.api";
+
 import type {
   Rider,
   RiderFilters,
   RiderStatus,
   RiderAccountStatus,
 } from "../riders.types";
+
 import { usePagination } from "../../../hooks/usePagination";
+import { getApiErrorMessage } from "../../../services/api/axios";
+
+function mapPassengerToRider(passenger: PassengerApi): Rider {
+  const firstName = passenger.firstName?.trim() || "";
+  const lastName = passenger.lastName?.trim() || "";
+  const name = `${firstName} ${lastName}`.trim() || passenger.email || "Passenger";
+
+  const profileImg = passenger.profileImage?.trim();
+  const avatarUrl =
+    profileImg && profileImg !== "null" && profileImg !== "undefined"
+      ? profileImg
+      : undefined;
+
+  return {
+    id: passenger.id,
+    riderCode: passenger.id,
+    name,
+    email: passenger.email || "",
+    avatarUrl,
+    phoneNumber: passenger.phone || "",
+    walletBalance: typeof passenger.walletBalance === "number" ? passenger.walletBalance : Number(passenger.walletBalance) || 0,
+    registrationDate: passenger.createdAt || "",
+    ridesTaken: typeof passenger.totalCompletedRides === "number" ? passenger.totalCompletedRides : Number(passenger.totalCompletedRides) || 0,
+    status: passenger.isActive ? "active" : "inactive",
+    accountStatus: "unblocked",
+  };
+}
 
 export function useRiders() {
   const [filters, setFilters] = useState<RiderFilters>(() => ({
     ...DEFAULT_RIDER_FILTERS,
   }));
-  const [riders, setRiders] = useState<Rider[]>(MOCK_RIDERS);
+
+  const [riders, setRiders] = useState<Rider[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadPassengers() {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await getPassengers({ signal: controller.signal });
+
+        if (controller.signal.aborted) return;
+
+        setRiders(response.data.map(mapPassengerToRider));
+      } catch (err: unknown) {
+        if (controller.signal.aborted) return;
+
+        setError(getApiErrorMessage(err));
+        setRiders([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadPassengers();
+
+    return () => {
+      controller.abort();
+    };
+  }, [refreshKey]);
 
   const filteredRiders = useMemo(() => {
     const search = filters.search.trim().toLowerCase();
@@ -24,16 +91,16 @@ export function useRiders() {
 
       const matchesSearch =
         !search ||
-        [rider.name, rider.riderCode, rider.phoneNumber].some((value) =>
-          value.toLowerCase().includes(search),
+        [rider.name, rider.riderCode, rider.phoneNumber, rider.email].some(
+          (value) => value.toLowerCase().includes(search),
         );
 
       const matchesFromDate = !filters.fromDate || date >= filters.fromDate;
 
       const matchesToDate = !filters.toDate || date <= filters.toDate;
 
-      const matchesLocation =
-        filters.location === "all" || riderLocation(rider) === filters.location;
+
+      const matchesLocation = filters.location === "all";
 
       const matchesStatus =
         filters.status === "all" || rider.status === filters.status;
@@ -76,8 +143,8 @@ export function useRiders() {
 
   const updateFilters = useCallback(
     (updates: Partial<RiderFilters>) => {
-      setFilters((currentFilters) => ({
-        ...currentFilters,
+      setFilters((current) => ({
+        ...current,
         ...updates,
       }));
 
@@ -91,24 +158,27 @@ export function useRiders() {
     resetPage();
   }, [resetPage]);
 
+
   const updateRiderStatus = useCallback((id: string, status: RiderStatus) => {
-    setRiders((currentRiders) =>
-      currentRiders.map((rider) =>
-        rider.id === id ? { ...rider, status } : rider,
-      ),
+    setRiders((current) =>
+      current.map((rider) => (rider.id === id ? { ...rider, status } : rider)),
     );
   }, []);
 
   const updateAccountStatus = useCallback(
     (id: string, accountStatus: RiderAccountStatus) => {
-      setRiders((currentRiders) =>
-        currentRiders.map((rider) =>
+      setRiders((current) =>
+        current.map((rider) =>
           rider.id === id ? { ...rider, accountStatus } : rider,
         ),
       );
     },
     [],
   );
+
+  const refreshRiders = useCallback(() => {
+    setRefreshKey((current) => current + 1);
+  }, []);
 
   return {
     filters,
@@ -123,13 +193,8 @@ export function useRiders() {
     totalPages,
     updateRiderStatus,
     updateAccountStatus,
+    isLoading,
+    error,
+    refreshRiders,
   };
-}
-
-// Mock location until the backend's rider schema provides a location field.
-function riderLocation(rider: Rider): string {
-  const locations = ["Bengaluru", "Pune", "Delhi", "Ahmedabad"];
-  const number = Number(rider.id.match(/\d+$/)?.[0] ?? 1);
-
-  return locations[(number - 1) % locations.length];
 }
